@@ -1,0 +1,36 @@
+import math
+# Input parameters
+tower_height = float(input("Enter the height of the tower in meters: "))
+distance = float(input("Enter the distance radius in kilometers: "))
+num_users = int(input("Enter the number of users: "))
+
+# Constants
+freq = 850  # Frequency in MHz
+tx_power = 50  # Transmit power in watts
+rx_sensitivity = -110  # Receiver sensitivity in dBm
+losses = 3  # Total losses in dB
+margin = 10  # Required margin in dB
+
+# Calculation
+tx_power_dbm = 10 * math.log10(tx_power * 1000)
+free_space_loss = 32.4 + 20 * math.log10(freq) + 20 * math.log10(distance * 1000)
+effective_isotropic_radiated_power = tx_power_dbm - losses
+received_power = effective_isotropic_radiated_power - free_space_loss
+required_power = rx_sensitivity - margin
+link_margin = received_power - required_power
+max_users = link_margin // 2
+
+# Output results
+print(f"Number of users: {num_users}")
+print(f"Frequency: {freq} MHz")
+print(f"Height of tower: {tower_height} m")
+print(f"Distance radius: {distance} km")
+print(f"Transmit power: {tx_power} W")
+print(f"Receiver sensitivity: {rx_sensitivity} dBm")
+print(f"Total losses: {losses} dB")
+print(f"Required margin: {margin} dB")
+print(f"Free space loss: {free_space_loss:.2f} dB")
+print(f"Effective isotropic radiated power: {effective_isotropic_radiated_power:.2f} dBm")
+print(f"Received power: {received_power:.2f} dBm")
+print(f"Link margin: {link_margin:.2f} dB")
+print(f"Maximum number of users: {max_users}")
