@@ -1,0 +1,45 @@
+import requests
+import time
+import math
+
+def get_gps_coordinates():
+  """Gets the GPS coordinates of the yagi antenna."""
+  response = requests.get("https://www.google.com/maps/api/geocode/json?address=here")
+  data = response.json()
+  return data["results"][0]["geometry"]["location"]
+
+def get_rssi():
+  """Gets the RSSI of the yagi antenna."""
+  with open("/dev/ttyUSB0", "r") as f:
+    rssi = f.readline()
+    rssi = int(rssi)
+  return rssi
+
+def get_azimuth():
+  """Gets the azimuth of the yagi antenna."""
+  with open("/dev/ttyUSB1", "r") as f:
+    azimuth = f.readline()
+    azimuth = int(azimuth)
+  return azimuth
+
+def get_elevation():
+  """Gets the elevation of the yagi antenna."""
+  with open("/dev/ttyUSB2", "r") as f:
+    elevation = f.readline()
+    elevation = int(elevation)
+  return elevation
+
+def send_data_to_website():
+  """Sends the data to the website."""
+  data = {
+    "gps_coordinates": get_gps_coordinates(),
+    "rssi": get_rssi(),
+    "azimuth": get_azimuth(),
+    "elevation": get_elevation()
+  }
+  response = requests.post("https://domainnamehere.com/yagi", data=data)
+
+if __name__ == "__main__":
+  while True:
+    send_data_to_website()
+    time.sleep(10)
