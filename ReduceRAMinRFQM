@@ -1,0 +1,28 @@
+import math
+
+def qam(data, carrier_frequency, bandwidth):
+  """
+  This function implements quadrature amplitude modulation.
+
+  Args:
+    data: The data to be modulated.
+    carrier_frequency: The carrier frequency.
+    bandwidth: The bandwidth of the signal.
+
+  Returns:
+    The modulated signal.
+  """
+
+  modulated_signal = []
+  for i in range(len(data)):
+    symbol = data[i]
+    sine_term = math.sin(2 * math.pi * carrier_frequency * i / bandwidth)
+    cosine_term = math.cos(2 * math.pi * carrier_frequency * i / bandwidth)
+    modulated_signal.append(symbol * sine_term + (1 - symbol) * cosine_term)
+
+  return modulated_signal
+
+if __name__ == "__main__":
+  data = [0, 1, 0, 1]
+  modulated_signal = qam(data, 490e6, 100e3)
+  print(modulated_signal)
