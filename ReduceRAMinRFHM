@@ -1,0 +1,37 @@
+import math
+import numpy as np
+
+def reduce_ram(signal, carrier_frequency):
+  """Reduces the RAM in a signal by filtering out the beat frequencies.
+
+  Args:
+    signal: The signal to be filtered.
+    carrier_frequency: The frequency of the carrier signal.
+
+  Returns:
+    The filtered signal.
+  """
+
+  beat_frequencies = [carrier_frequency - 2a, carrier_frequency + 2a]
+  filter_coefficients = np.zeros(len(signal))
+  for beat_frequency in beat_frequencies:
+    filter_coefficients[abs(beat_frequency - signal)] = 1
+
+  filtered_signal = np.convolve(signal, filter_coefficients)
+  return filtered_signal
+
+def main():
+  """Demonstrates the use of the reduce_ram function."""
+
+  signal = np.sin(2 * np.pi * 490e6 * np.linspace(0, 1, 1000))
+  filtered_signal = reduce_ram(signal, 490e6)
+
+  import matplotlib.pyplot as plt
+
+  plt.plot(signal, label="Original signal")
+  plt.plot(filtered_signal, label="Filtered signal")
+  plt.legend()
+  plt.show()
+
+if __name__ == "__main__":
+  main()
