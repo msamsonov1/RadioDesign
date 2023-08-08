@@ -1,0 +1,98 @@
+import numpy as np
+import rtlsdr
+import time
+
+def generate_cancellation_signal(frequency, bandwidth):
+  """Generates a cancellation signal for the specified frequency and bandwidth.
+
+  Args:
+    frequency: The frequency of the interfering noise.
+    bandwidth: The bandwidth of the interfering noise.
+
+  Returns:
+    The cancellation signal.
+  """
+
+  cancellation_signal = np.zeros(bandwidth)
+  for i in range(bandwidth):
+    cancellation_signal[i] = -1 * np.cos(2 * np.pi * frequency * i / bandwidth)
+
+  return cancellation_signal
+
+def main():
+  """The main function."""
+
+  # Set up the RTLSDR dongle.
+  rtlsdr = rtlsdr.RtlSdr()
+  rtlsdr.set_center_freq(490.4375e6)
+  rtlsdr.set_sample_rate(2.8e6)
+
+  # Initialize the BER and RSSI variables.
+  ber = 1.0
+  rssi = 0
+
+  # Start the main loop.
+  while True:
+    # Get the current BER and RSSI values.
+    ber, rssi = get_ber_and_rssi(rtlsdr)
+
+    # If the BER is bad but the RSSI is good, generate the cancellation signal and send it to the RTLSDR dongle.
+    if ber > 0.05 and rssi > -100:
+      cancellation_signal = generate_cancellation_signal(frequency, bandwidth)
+      rtlsdr.write_samples(cancellation_signal)
+
+    # Sleep for a second.
+    time.sleep(1)
+
+def get_ber_and_rssi(rtlsdr):
+  """Gets the BER and RSSI values from the RTLSDR dongle.
+
+  Args:
+    rtlsdr: The RTLSDR dongle.
+
+  Returns:
+    The BER and RSSI values.
+  """
+
+  samples = rtlsdr.read_samples(1024)
+  ber = calculate_ber(samples)
+  rssi = calculate_rssi(samples)
+
+  return ber, rssi
+
+def calculate_ber(samples):
+  """Calculates the BER from the specified samples.
+
+  Args:
+    samples: The samples.
+
+  Returns:
+    The BER.
+  """
+
+  bits = np.unpackbits(samples)
+  error_count = 0
+  for i in range(len(bits)):
+    if bits[i] != 0:
+      error_count += 1
+
+  ber = error_count / len(bits)
+
+  return ber
+
+def calculate_rssi(samples):
+  """Calculates the RSSI from the specified samples.
+
+  Args:
+    samples: The samples.
+
+  Returns:
+    The RSSI.
+  """
+
+  rssi = np.mean(np.abs(samples))
+
+  return rssi
+
+if __name__ == "__main__":
+  main()
