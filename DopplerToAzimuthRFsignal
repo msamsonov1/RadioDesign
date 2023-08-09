@@ -1,0 +1,56 @@
+import rtlsdr
+import numpy as np
+import matplotlib.pyplot as plt
+
+def get_doppler_azimuth(center_freq, sample_freq, sample_rate, current_location):
+  """Gets the direction in azimuth in degrees where the radio signal is coming from.
+
+  Args:
+    center_freq: The center frequency of the RTL-SDR.
+    sample_freq: The sample frequency of the RTL-SDR.
+    sample_rate: The sample rate of the RTL-SDR.
+    current_location: The current location of the user.
+
+  Returns:
+    The direction in azimuth in degrees where the radio signal is coming from.
+  """
+
+  # Get the current time.
+  current_time = np.datetime64('now')
+
+  # Create an RTL-SDR object.
+  sdr = rtlsdr.Rtlsdr()
+
+  # Set the center frequency of the RTL-SDR.
+  sdr.set_center_freq(center_freq)
+
+  # Set the sample frequency of the RTL-SDR.
+  sdr.set_sample_freq(sample_freq)
+
+  # Get the samples from the RTL-SDR.
+  samples = sdr.read_samples(sample_rate)
+
+  # Calculate the Doppler shift.
+  doppler_shift = (center_freq * current_location['latitude'] *
+                   current_location['longitude'] / 2 * np.pi * sample_rate)
+
+  # Calculate the direction in azimuth in degrees.
+  azimuth = np.arctan2(doppler_shift, sample_freq)
+
+  return azimuth
+
+def main():
+  # Get the current location of the user.
+  current_location = {'latitude': 37.7749, 'longitude': -122.4194}
+
+  # Get the direction in azimuth in degrees where the radio signal is coming from.
+  azimuth = get_doppler_azimuth(490.4375e6, 2.4e6, 20e6, current_location)
+
+  # Plot the direction in azimuth in degrees.
+  plt.plot([0, azimuth], [0, 1], color='red')
+  plt.ylabel('Azimuth (degrees)')
+  plt.xlabel('Time (s)')
+  plt.show()
+
+if __name__ == '__main__':
+  main()
