@@ -1,0 +1,49 @@
+def create_kml(data, filename, folder_path):
+  """
+  Creates a KML file with placemarks for each data point containing latitude and longitude.
+
+  Args:
+      data (list): List of dictionaries where each dictionary has keys 'lat' (latitude) and 'lon' (longitude).
+      filename (str): Name of the KML file to be created.
+      folder_path (str): Path to the folder where the KML file will be saved.
+  """  
+  kml = [
+     '<?xml version="1.0" encoding="UTF-8"?>',
+     '<kml xmlns="http://www.opengis.net/kml/2.2">',
+     '  <Document>',
+    '    <name>KML Points</name>'
+  ]
+
+  for point in data:
+    latitude = point.get('lat')
+    longitude = point.get('lon')
+    if latitude and longitude:  # Check if both lat and lon are present
+      kml.append(f'''
+        <Placemark>
+          <name>{point.get('name', 'Interference OPS1')}</name>
+          <Point>
+            <coordinates>{longitude},{latitude},0</coordinates>
+          </Point>
+        </Placemark>
+      ''')
+
+  kml.extend([
+    '  </Document>',
+    '</kml>'
+  ])
+
+  with open(f"{folder_path}/{filename}.kml", 'w') as f:
+    f.write('\n'.join(kml))
+
+# Example usage
+data = [
+  {'lat': 38.8977, 'lon': -77.0365, 'name': 'Interference OPS1'},
+  {'lat': 38.9047, 'lon': -77.0423}
+]
+
+filename = "my_points2"
+folder_path = "/Users/mikhailsamsonov/Downloads/"  # Replace with your desired folder path
+
+create_kml(data, filename, folder_path)
+
+print(f"KML file '{filename}.kml' created and saved to {folder_path}")
