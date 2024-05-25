@@ -1,0 +1,40 @@
+import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib.animation import FuncAnimation
+
+# Define wave parameters (adjust for desired wave behavior)
+wavelength = 2  # Wavelength in units of x-axis scale
+amplitude = 1  # Amplitude of the wave
+wave_speed = 0.2  # Speed of the wave propagation (positive for rightward movement)
+fps = 20  # Frames per second for animation smoothness
+
+# Create spatial coordinates
+x = np.linspace(-5, 5, 200)  # Adjust x-axis range based on desired wave visualization
+
+def animate(i):
+  # Calculate phase shift based on frame number and wave speed
+  phase_shift = i * wave_speed / fps
+
+  # Generate wave equation (modify for different wave shapes)
+  y = amplitude * np.sin(2 * np.pi * x / wavelength + phase_shift)  # Sine wave equation
+
+  # Clear the plot for each frame (optional for smoother animation)
+  plt.cla()
+
+  # Plot the wave
+  plt.plot(x, y, color='blue', linewidth=2)  # Adjust line color and width
+
+  # Set plot limits (adjust for desired viewing area)
+  plt.xlim(-5, 5)  # Adjust x-axis limits based on x and wavelength
+  plt.ylim(-amplitude - amplitude / 5, amplitude + amplitude / 5)  # Adjust y-axis limits based on amplitude
+
+  # Set labels (optional)
+  plt.xlabel("X")
+  plt.ylabel("Y")
+
+# Create the animation object
+fig, ax = plt.subplots()
+ani = FuncAnimation(fig, animate, frames=300, interval=1000 / fps)  # Adjust frames and interval for animation duration and smoothness
+
+plt.title("Moving Wave")
+plt.show()
